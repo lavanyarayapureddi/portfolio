@@ -88,7 +88,7 @@ export const projects = [
       'A modern responsive portfolio website showcasing my skills, projects, education, experience, resume, and contact information with an elegant UI and smooth user experience.',
     tech: ['React.js', 'JavaScript', 'Node.js', 'Framer Motion', 'Vite'],
     github: 'https://github.com/lavanyarayapureddi/portfolio',
-    live: 'https://your-portfolio.vercel.app',
+    live: 'https://portfolio-plum-seven-gu1q2kvclp.vercel.app/',
     image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&q=80&w=900',
     color: '#f72585',
     type: 'featured',
