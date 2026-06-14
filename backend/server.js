@@ -24,7 +24,14 @@ app.use(cors({
   origin: (origin, callback) => {
     console.log(`ℹ️  Incoming CORS request from Origin: "${origin}"`)
     const formattedOrigin = origin ? origin.replace(/\/$/, '') : null
-    if (!origin || allowedOrigins.includes(formattedOrigin)) {
+    
+    // Check if the origin matches allowed list OR is a local development address
+    const isLocalhost = formattedOrigin && (
+      /^https?:\/\/localhost(:\d+)?$/.test(formattedOrigin) || 
+      /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(formattedOrigin)
+    )
+
+    if (!origin || allowedOrigins.includes(formattedOrigin) || isLocalhost) {
       console.log(`✅  CORS origin accepted: "${origin}"`)
       return callback(null, true)
     }
