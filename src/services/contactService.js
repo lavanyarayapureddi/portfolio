@@ -4,7 +4,11 @@
  * Base URL switches automatically between local dev and Vite production env var.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_BASE_URL = import.meta.env.VITE_API_URL !== undefined 
+  ? import.meta.env.VITE_API_URL 
+  : (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+    ? 'http://localhost:5000'
+    : ''
 
 /**
  * Sends a contact form submission to the backend.

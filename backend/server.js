@@ -31,12 +31,18 @@ app.use(cors({
       /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(formattedOrigin)
     )
 
-    if (!origin || allowedOrigins.includes(formattedOrigin) || isLocalhost) {
+    // Check if origin matches Vercel or Netlify subdomains
+    const isVercelOrNetlify = formattedOrigin && (
+      /^https?:\/\/.*\.vercel\.app$/.test(formattedOrigin) ||
+      /^https?:\/\/.*\.netlify\.app$/.test(formattedOrigin)
+    )
+
+    if (!origin || allowedOrigins.includes(formattedOrigin) || isLocalhost || isVercelOrNetlify) {
       console.log(`✅  CORS origin accepted: "${origin}"`)
       return callback(null, true)
     }
     console.warn(`⚠️  CORS blocked origin: "${origin}". Allowed origins are:`, allowedOrigins)
-    callback(new Error(`CORS: origin ${origin} not allowed`))
+    callback(null, false)
   },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
@@ -70,18 +76,22 @@ app.use((err, _req, res, _next) => {
 })
 
 // ── Start ─────────────────────────────────────────────────────────────────────
-app.listen(PORT, async () => {
-  console.log(`🚀  Backend running on http://localhost:${PORT}`)
-  
-  // Validate and log critical environment variables
-  console.log('ℹ️  Verifying environment variables at startup:')
-  console.log(`  - EMAIL_USER: ${process.env.EMAIL_USER ? `"${process.env.EMAIL_USER}"` : '⚠️  NOT SET'}`)
-  console.log(`  - EMAIL_PASS: ${process.env.EMAIL_PASS ? '[Configured]' : '⚠️  NOT SET'}`)
-  console.log(`  - FRONTEND_URL: ${process.env.FRONTEND_URL ? `"${process.env.FRONTEND_URL}"` : '⚠️  NOT SET'}`)
-  console.log(`  - SMTP_HOST: ${process.env.SMTP_HOST ? `"${process.env.SMTP_HOST}"` : 'Not set (falling back to smtp.gmail.com)'}`)
-  console.log(`  - SMTP_USER: ${process.env.SMTP_USER ? `"${process.env.SMTP_USER}"` : 'Not set'}`)
-  console.log(`  - EMAIL_FROM: ${process.env.EMAIL_FROM ? `"${process.env.EMAIL_FROM}"` : 'Not set'}`)
-  console.log(`  - EMAIL_TO: ${process.env.EMAIL_TO ? `"${process.env.EMAIL_TO}"` : 'Not set'}`)
+if (require.main === module) {
+  app.listen(PORT, async () => {
+    console.log(`🚀  Backend running on http://localhost:${PORT}`)
+    
+    // Validate and log critical environment variables
+    console.log('ℹ️  Verifying environment variables at startup:')
+    console.log(`  - EMAIL_USER: ${process.env.EMAIL_USER ? `"${process.env.EMAIL_USER}"` : '⚠️  NOT SET'}`)
+    console.log(`  - EMAIL_PASS: ${process.env.EMAIL_PASS ? '[Configured]' : '⚠️  NOT SET'}`)
+    console.log(`  - FRONTEND_URL: ${process.env.FRONTEND_URL ? `"${process.env.FRONTEND_URL}"` : '⚠️  NOT SET'}`)
+    console.log(`  - SMTP_HOST: ${process.env.SMTP_HOST ? `"${process.env.SMTP_HOST}"` : 'Not set (falling back to smtp.gmail.com)'}`)
+    console.log(`  - SMTP_USER: ${process.env.SMTP_USER ? `"${process.env.SMTP_USER}"` : 'Not set'}`)
+    console.log(`  - EMAIL_FROM: ${process.env.EMAIL_FROM ? `"${process.env.EMAIL_FROM}"` : 'Not set'}`)
+    console.log(`  - EMAIL_TO: ${process.env.EMAIL_TO ? `"${process.env.EMAIL_TO}"` : 'Not set'}`)
 
-  await verifyTransporter()
-})
+    await verifyTransporter()
+  })
+}
+
+module.exports = app
